@@ -1,11 +1,4 @@
+USE mycompany_db;
+INSERT INTO role (title, salary, department_id)
 
-INSERT INTO `mycompany`.`role`
-(`id`,
-`title`,
-`salary`,
-`department_id`)
-VALUES
-(<{id: }>,
-<{title: }>,
-<{salary: }>,
-<{department_id: }>);
+VALUES ("Director of engineering"),(150000),(2);

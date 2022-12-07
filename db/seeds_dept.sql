@@ -1,10 +1,10 @@
+USE mycompany_db;
 
-INSERT INTO `mycompany`.`department`
-(`id`,
-`name`)
+INSERT INTO `department`
+(`name`)
 VALUES
-(<{id: }>,
-<{name: }>);
+("Marketing"), ("Sales"), ("Engineering"), ("Sourcing")
+
 
 
 
