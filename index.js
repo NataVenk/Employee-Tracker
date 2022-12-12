@@ -65,12 +65,31 @@ const viewRole = () => {
         })
 }
 
-const viewEmpl = () => {
-    return connection.promise().query(
-        `SELECT * FROM  employee`).then(result => {
-            console.table(result[0])
+const viewEmpl = async () => {
+
+    const emplAll = await dbQuery("SELECT * FROM employee");
+    const emplChoices = emplAll.map( employee => ({
+        name: employee.last_name + employee.first_name,
+        value: employee.id
+       
+    }));
+    const roles = await dbQuery("SELECT * FROM role");
+    const roleChoices = roles.map( role => ({
+        name: role.title,
+        value: role.id
+        
+    }));
+    const deptAll = await dbQuery("SELECT * FROM department");
+    const deptChoices = deptAll.map( department => ({
+        name: department.name,
+        value: department.id
+       
+    }));
+    
+     
+            console.table([emplChoices,deptChoices,roleChoices])
             mainMenu();
-        })
+        
 }
 
 
@@ -159,8 +178,12 @@ const addEmpl = async () => {
     const mngrChoices = managers.map( manager => ({
         name: manager.last_name + manager.first_name,
         value: manager.id
+    }
+   
+    ))
+    let mngrOptions =[{name:"None",value:null},...mngrChoices]
 
-    }));
+
     const answer = await inquirer.prompt([
 
         {
@@ -183,7 +206,7 @@ const addEmpl = async () => {
             type: "list",
             message: "Who is employee manager?",
             name: "manager_id",
-            choices: mngrChoices + none,
+            choices: mngrOptions,
         },
 
 
@@ -212,8 +235,15 @@ const updateEmpl = async () => {
     const roleChoices = roles.map( role => ({
         name: role.title,
         value: role.id
+    }));
+    const managers = await dbQuery("SELECT * FROM employee");
+      
+    const mngrChoices = managers.map( manager => ({
+        name: manager.last_name + manager.first_name,
+        value: manager.id
         
     }));
+    let mngrOptions =[{name:"None",value:null},...mngrChoices]
     console.log(emplChoices)
 
     const answer = await inquirer.prompt([
@@ -230,10 +260,17 @@ const updateEmpl = async () => {
             name: "role_id",
             choices: roleChoices,
         },
+        {
+            type: "list",
+            message: "Who is employee manager?",
+            name: "manager_id",
+            choices: mngrOptions,
+        },
         
 
 
     ]);
+
     
         connection.query("INSERT INTO employee SET ?", [answer],
             function (err, result) {
