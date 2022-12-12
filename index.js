@@ -13,46 +13,46 @@ const { table } = require('table');
 // }
 const dbQuery = (query) => {
     // another section to take in input... and create a dynamic promise
-  
-    return new Promise( (resolve, reject) => { 
-      connection.query(query, function (err, results) {
-        // if bad
-        if(err){
-          return reject(err);
-        }
-  
-        // good
-        // console.log(results);
-        return resolve(results);
-      });
-  
+
+    return new Promise((resolve, reject) => {
+        connection.query(query, function (err, results) {
+            // if bad
+            if (err) {
+                return reject(err);
+            }
+
+            // good
+            // console.log(results);
+            return resolve(results);
+        });
+
     });
-  };
-  
-  const dbQuery2 = (query,parameters) => {
+};
+
+const dbQuery2 = (query, parameters) => {
     // another section to take in input... and create a dynamic promise
-  
-    return new Promise( (resolve, reject) => { 
-      connection.query(query, parameters, function (err, results) {
-        // if bad
-        if(err){
-          return reject(err);
-        }
-  
-        // good
-        // console.log(results);
-        return resolve(results);
-      });
-  
+
+    return new Promise((resolve, reject) => {
+        connection.query(query, parameters, function (err, results) {
+            // if bad
+            if (err) {
+                return reject(err);
+            }
+
+            // good
+            // console.log(results);
+            return resolve(results);
+        });
+
     });
-  };
+};
 const viewDept = () => {
 
     return connection.promise().query(
         `SELECT * FROM  department;`).then(result => {
             console.table(result[0])
             mainMenu();
-            
+
         })
 }
 
@@ -68,28 +68,28 @@ const viewRole = () => {
 const viewEmpl = async () => {
 
     const emplAll = await dbQuery("SELECT * FROM employee");
-    const emplChoices = emplAll.map( employee => ({
+    const emplChoices = emplAll.map(employee => ({
         name: employee.last_name + employee.first_name,
         value: employee.id
-       
+
     }));
     const roles = await dbQuery("SELECT * FROM role");
-    const roleChoices = roles.map( role => ({
+    const roleChoices = roles.map(role => ({
         name: role.title,
         value: role.id
-        
+
     }));
     const deptAll = await dbQuery("SELECT * FROM department");
-    const deptChoices = deptAll.map( department => ({
+    const deptChoices = deptAll.map(department => ({
         name: department.name,
         value: department.id
-       
+
     }));
-    
-     
-            console.table([emplChoices,deptChoices,roleChoices])
-            mainMenu();
-        
+
+
+    console.table([emplChoices, deptChoices, roleChoices])
+    mainMenu();
+
 }
 
 
@@ -142,46 +142,46 @@ const addRole = () => {
 }
 
 
-    const addDept = () => {
+const addDept = () => {
 
-        return inquirer.prompt([
+    return inquirer.prompt([
 
-            {
-                type: "input",
-                message: "Enter department name",
-                name: "name"
-            },
+        {
+            type: "input",
+            message: "Enter department name",
+            name: "name"
+        },
 
-        ]).then(answers => {
-            connection.query("INSERT INTO department SET ?", [answers],
-                function (err, result) {
-                    if (err) {
-                        console.log(err);
-                    }
-                    console.log("Department added")
-                    mainMenu();
-                });
-        },)
+    ]).then(answers => {
+        connection.query("INSERT INTO department SET ?", [answers],
+            function (err, result) {
+                if (err) {
+                    console.log(err);
+                }
+                console.log("Department added")
+                mainMenu();
+            });
+    },)
 
 
-    }
+}
 
 const addEmpl = async () => {
     const roles = await dbQuery("SELECT * FROM role");
-    const roleChoices = roles.map( role => ({
+    const roleChoices = roles.map(role => ({
         name: role.title,
         value: role.id
-        
-      }));
-      const managers = await dbQuery("SELECT * FROM employee");
-      
-    const mngrChoices = managers.map( manager => ({
+
+    }));
+    const managers = await dbQuery("SELECT * FROM employee");
+
+    const mngrChoices = managers.map(manager => ({
         name: manager.last_name + manager.first_name,
         value: manager.id
     }
-   
+
     ))
-    let mngrOptions =[{name:"None",value:null},...mngrChoices]
+    let mngrOptions = [{ name: "None", value: null }, ...mngrChoices]
 
 
     const answer = await inquirer.prompt([
@@ -211,40 +211,40 @@ const addEmpl = async () => {
 
 
     ]);
-    
-        connection.query("INSERT INTO employee SET ?", [answer],
-            function (err, result) {
-                if (err) {
-                    console.log(err);
-                }
-   
-    console.log("Employee added")
-                    mainMenu();
-    
-    },)
+
+    connection.query("INSERT INTO employee SET ?", [answer],
+        function (err, result) {
+            if (err) {
+                console.log(err);
+            }
+
+            console.log("Employee added")
+            mainMenu();
+
+        },)
 }
 const updateEmpl = async () => {
 
     const emplAll = await dbQuery("SELECT * FROM employee");
-    const emplChoices = emplAll.map( employee => ({
+    const emplChoices = emplAll.map(employee => ({
         name: employee.last_name + employee.first_name,
         value: employee.id
-       
+
     }));
     const roles = await dbQuery("SELECT * FROM role");
-    const roleChoices = roles.map( role => ({
+    const roleChoices = roles.map(role => ({
         name: role.title,
         value: role.id
     }));
     const managers = await dbQuery("SELECT * FROM employee");
-      
-    const mngrChoices = managers.map( manager => ({
+
+    const mngrChoices = managers.map(manager => ({
         name: manager.last_name + manager.first_name,
         value: manager.id
-        
+
     }));
-    let mngrOptions =[{name:"None",value:null},...mngrChoices]
-    console.log(emplChoices)
+    let mngrOptions = [{ name: "None", value: null }, ...mngrChoices]
+
 
     const answer = await inquirer.prompt([
 
@@ -265,74 +265,83 @@ const updateEmpl = async () => {
             message: "Who is employee manager?",
             name: "manager_id",
             choices: mngrOptions,
-        },
-        
-
+        }
 
     ]);
 
-    
-        connection.query("INSERT INTO employee SET ?", [answer],
-            function (err, result) {
-                if (err) {
-                    console.log(err);
-                }
-   
-    console.log("Employee updated")
-                    mainMenu();
-    
-    },)
+
+    const sql = "UPDATE employee SET ?"
+    const params = [req.body.employee, req.params.id];
+
+    dbQuery2(sql, params, (err, result) => {
+        if (err) {
+            res.status(400).json({ error: err.message });
+        } else if (!result.affectedRows) {
+            res.json({
+                message: 'Employee not updated'
+            });
+        } else {
+            res.json({
+                message: 'Employee updated',
+                data: req.body,
+                changes: result.affectedRows
+            });
+            mainMenu();
+        }
+    });
 }
-    const program_exit = () =>{
-        // use this when you want to exit the script
-        connection.end();
-      }
 
-    const mainMenu = () => {
-        return inquirer.prompt([
-            {
-                type: "list",
-                message: "What would you like to do? ",
-                choices: ["View all Employees", "Add an Employee", "Update Employee Role", "Add Role", "View all Roles", "View all Departments", "Add Department", "Exit"],
-                name: "option"
+
+const program_exit = () => {
+    // use this when you want to exit the script
+    connection.end();
+}
+
+const mainMenu = () => {
+    return inquirer.prompt([
+        {
+            type: "list",
+            message: "What would you like to do? ",
+            choices: ["View all Employees", "Add an Employee", "Update Employee Role", "Add Role", "View all Roles", "View all Departments", "Add Department", "Exit"],
+            name: "option"
+        }
+    ])
+        .then(({ option }) => {
+            console.log(option)
+            switch (option) {
+                case "Exit":
+                    program_exit();
+                    break;
+                case "View all Employees":
+                    viewEmpl();
+                    break;
+                case "Add an Employee":
+                    addEmpl();
+                    break;
+                case "View all Departments":
+                    viewDept();
+                    break;
+                case "Add Department":
+                    addDept();
+                    break;
+
+                case "Add Role":
+                    addRole();
+                    break;
+                case "View all Roles":
+                    viewRole();
+                    break;
+                case "Update Employee Role":
+                    updateEmpl();
+                    break;
+
+
+
             }
-        ])
-            .then(({ option }) => {
-                console.log(option)
-                switch (option) {
-                    case "Exit":
-                        program_exit();
-                        break;
-                    case "View all Employees":
-                        viewEmpl();
-                        break;
-                    case "Add an Employee":
-                        addEmpl();
-                        break;
-                    case "View all Departments":
-                        viewDept();
-                        break;
-                    case "Add Department":
-                        addDept();
-                        break;
-
-                    case "Add Role":
-                        addRole();
-                        break;
-                    case "View all Roles":
-                        viewRole();
-                        break;
-                    case "Update Employee Role":
-                        updateEmpl();
-                        break;
+        })
 
 
-
-                }
-            })
-           
-
-    };
-    mainMenu();
+};
+mainMenu();
 
 
