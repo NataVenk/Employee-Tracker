@@ -5,6 +5,8 @@ const connection = require('./db/connection.js');
 
 const inquirer = require('inquirer');
 
+const { table } = require('table');
+
 
 // const program_exit = () => {
 //     connection.end();
@@ -50,6 +52,7 @@ const viewDept = () => {
         `SELECT * FROM  department;`).then(result => {
             console.table(result[0])
             mainMenu();
+            
         })
 }
 
@@ -65,7 +68,7 @@ const viewRole = () => {
 const viewEmpl = () => {
     return connection.promise().query(
         `SELECT * FROM  employee`).then(result => {
-            console.log(result[0])
+            console.table(result[0])
             mainMenu();
         })
 }
@@ -152,6 +155,7 @@ const addEmpl = async () => {
         
       }));
       const managers = await dbQuery("SELECT * FROM employee");
+      
     const mngrChoices = managers.map( manager => ({
         name: manager.last_name + manager.first_name,
         value: manager.id
@@ -179,7 +183,7 @@ const addEmpl = async () => {
             type: "list",
             message: "Who is employee manager?",
             name: "manager_id",
-            choices: mngrChoices,
+            choices: mngrChoices + none,
         },
 
 
@@ -215,7 +219,7 @@ const updateEmpl = async () => {
     const answer = await inquirer.prompt([
 
         {
-            type: "input",
+            type: "list",
             message: "Which employee would you like to update?",
             name: "employee_name",
             choices: emplChoices,
