@@ -8,9 +8,7 @@ const inquirer = require('inquirer');
 const { table } = require('table');
 
 
-// const program_exit = () => {
-//     connection.end();
-// }
+
 const dbQuery = (query) => {
     // another section to take in input... and create a dynamic promise
 
@@ -21,8 +19,7 @@ const dbQuery = (query) => {
                 return reject(err);
             }
 
-            // good
-            // console.log(results);
+          
             return resolve(results);
         });
 
@@ -34,13 +31,11 @@ const dbQuery2 = (query, parameters) => {
 
     return new Promise((resolve, reject) => {
         connection.query(query, parameters, function (err, results) {
-            // if bad
+            
             if (err) {
                 return reject(err);
             }
 
-            // good
-            // console.log(results);
             return resolve(results);
         });
 
@@ -67,27 +62,11 @@ const viewRole = () => {
 
 const viewEmpl = async () => {
 
-    const emplAll = await dbQuery("SELECT * FROM employee");
-    const emplChoices = emplAll.map(employee => ({
-        name: employee.last_name + employee.first_name,
-        value: employee.id
-
-    }));
-    const roles = await dbQuery("SELECT * FROM role");
-    const roleChoices = roles.map(role => ({
-        name: role.title,
-        value: role.id
-
-    }));
-    const deptAll = await dbQuery("SELECT * FROM department");
-    const deptChoices = deptAll.map(department => ({
-        name: department.name,
-        value: department.id
-
-    }));
+    const emplAll = await dbQuery(`SELECT e.id, e.first_name, e.last_name, r.title, r.salary, d.name FROM employee AS e INNER JOIN role AS r on r.id = e.role_id INNER JOIN department AS d on d.id = r.department_id`);
+   
 
 
-    console.table([emplChoices, deptChoices, roleChoices])
+    console.table(emplAll)
     mainMenu();
 
 }
@@ -176,7 +155,7 @@ const addEmpl = async () => {
     const managers = await dbQuery("SELECT * FROM employee");
 
     const mngrChoices = managers.map(manager => ({
-        name: manager.last_name + manager.first_name,
+        name: manager.last_name + " " + manager.first_name,
         value: manager.id
     }
 
@@ -227,7 +206,7 @@ const updateEmpl = async () => {
 
     const emplAll = await dbQuery("SELECT * FROM employee");
     const emplChoices = emplAll.map(employee => ({
-        name: employee.last_name + employee.first_name,
+        name: employee.last_name + " " + employee.first_name,
         value: employee.id
 
     }));
@@ -239,7 +218,7 @@ const updateEmpl = async () => {
     const managers = await dbQuery("SELECT * FROM employee");
 
     const mngrChoices = managers.map(manager => ({
-        name: manager.last_name + manager.first_name,
+        name: manager.last_name + " " + manager.first_name,
         value: manager.id
 
     }));
@@ -269,28 +248,13 @@ const updateEmpl = async () => {
 
     ]);
 
+    // UPDATE employee SET role_id = ? AND manager_id = ? WHERE id = ?
+    const sql = "UPDATE employee SET  role_id = ?, manager_id = ? WHERE id = ?"
+    const params = [answer.role_id, answer.manager_id, answer.employee_name];
 
-    const sql = "UPDATE employee SET ?"
-    const params = [req.body.employee, req.params.id];
-
-    dbQuery2(sql, params, (err, result) => {
-        if (err) {
-            res.status(400).json({ error: err.message });
-        } else if (!result.affectedRows) {
-            res.json({
-                message: 'Employee not updated'
-            });
-        } else {
-            res.json({
-                message: 'Employee updated',
-                data: req.body,
-                changes: result.affectedRows
-            });
-            mainMenu();
-        }
-    });
+    await dbQuery2(sql, params)
+   mainMenu();
 }
-
 
 const program_exit = () => {
     // use this when you want to exit the script
